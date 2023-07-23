@@ -11,9 +11,12 @@ import {
 } from "@chakra-ui/react";
 import Loader from "./Loader";
 import ErrorComponent from "./ErrorComponent";
+import PaginationExchanges from "./PaginationExchnages";
 
 const Exchanges = () => {
   const [exchanges, setExchanges] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [exchangesPerPage, setExchangesPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -34,6 +37,11 @@ const Exchanges = () => {
   if (error)
     return <ErrorComponent message={"Error While Fetching Exchanges"} />;
 
+  //Get Current posts
+  const indexOfLastPost = currentPage * exchangesPerPage;
+  const indexOfFirstPost = indexOfLastPost - exchangesPerPage;
+  const currentExchanges = exchanges.slice(indexOfFirstPost, indexOfLastPost);
+
   return (
     <Container maxW={"container.xl"}>
       {loading ? (
@@ -41,7 +49,7 @@ const Exchanges = () => {
       ) : (
         <>
           <HStack wrap={"wrap"} justifyContent={"space-evenly"}>
-            {exchanges.map((i) => (
+            {currentExchanges.map((i) => (
               <ExchangeCard
                 key={i.id}
                 name={i.name}
@@ -50,6 +58,14 @@ const Exchanges = () => {
                 url={i.url}
               />
             ))}
+          </HStack>
+          <HStack wrap={"wrap"} justifyContent={"space-evenly"}>
+            <PaginationExchanges
+              exchangesPerPage={exchangesPerPage}
+              totalExchanges={exchanges.length}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+            />
           </HStack>
         </>
       )}
